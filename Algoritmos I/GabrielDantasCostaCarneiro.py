@@ -1,13 +1,17 @@
+# Código do problema 02 do PBL de Algoritmos: fuga do labirinto
+# Código desenvolvido único e exclusivamente por Gabriel Dantas Costa Carneiro sem utilização de ferramentas de inteligência artificial
+# Aluno: Gabriel Dantas Costa Carneiro // Matrícula: 26111296
+# Professora: Michele Fúlvia Angelo
+
 import subprocess
 import random
+import time
 
 personagem_x = 0
 personagem_y = 0
 tamanho = 0
-
-# Fazer chave ser gerada em um dos quadrantes opostos ao personagem e ao fim.
-# Fazer final ser coberto por paredes e uma porta
-# Fazer contador de tempo
+chaves = 0
+tempo_restante = 180
 
 def mostrar_labirinto(labirinto, tamanho):
 
@@ -59,26 +63,21 @@ def gerar_labirinto(tamanho):
     def cavar_caminho(x, y):
 
         if x != personagem_x or y != personagem_y:
-            labirinto[y][x] = 3  # Marca a célula atual como caminho
+            labirinto[y][x] = 3 
         
-        # Direções: (dx, dy) pulando 2 casas para manter as paredes entre os caminhos
         direcoes = [(0, 2), (0, -2), (2, 0), (-2, 0)]
         random.shuffle(direcoes)
         
-        for dx, dy in direcoes:
-            nx, ny = x + dx, y + dy
+        for direcao_x, direcao_y in direcoes:
+            passos_x = x + direcao_x
+            passos_y = y + direcao_y
             
-            # Verifica se a nova posição está dentro do mapa e se ainda é parede
-            if 0 <= nx < tamanho and 0 <= ny < tamanho and labirinto[ny][nx] == 'X':
-                # Remove a parede entre a célula atual e a próxima
-                labirinto[y + dy // 2][x + dx // 2] = 3
-                cavar_caminho(nx, ny)
+            if passos_x >= 0 and passos_x < tamanho and passos_y >= 0 and passos_y < tamanho and labirinto[passos_y][passos_x] == 'X':
+                labirinto[y + direcao_y // 2][x + direcao_x // 2] = 3
+                cavar_caminho(passos_x, passos_y)
     
     cavar_caminho(personagem_x, personagem_y)
 
-    
-    # Se o destino for cercado por paredes, "quebramos" uma parede vizinha
-    # para garantir que ele esteja conectado ao resto do labirinto
     if y_final == tamanho - 1: 
         labirinto[y_final - 1][x_final] = 7
 
@@ -134,39 +133,49 @@ while comando != 'f':
 
     comando = input("Digite o movimento do seu personagem(W, A, S, D): ")
 
+    passo_novo_x = personagem_x
+    passo_novo_y = personagem_y
+
     match comando.lower():
 
         case 'w':
-
-            labirinto[personagem_y][personagem_x] = 3
-            if (personagem_y > 0 and labirinto[personagem_y - 1][personagem_x] != 2):
-                personagem_y -= 1
+                passo_novo_y -= 1
 
         case 'a':
-
-            labirinto[personagem_y][personagem_x] = 3
-            if (personagem_x > 0 and labirinto[personagem_y][personagem_x - 1] != 2):
-                personagem_x -= 1
+                passo_novo_x -= 1
             
         case 's':
-
-            labirinto[personagem_y][personagem_x] = 3
-            if (personagem_y + 1 < len(labirinto) and labirinto[personagem_y + 1][personagem_x] != 2):
-                personagem_y += 1
+                passo_novo_y += 1
 
         case 'd':
-
-            labirinto[personagem_y][personagem_x] = 3
-            if (personagem_x < len(labirinto[personagem_y]) and labirinto[personagem_y][personagem_x + 1] != 2):
-                personagem_x += 1
+                passo_novo_x += 1
 
         case _:
 
             print('Movimento inválido!')
-    
-    if labirinto[personagem_y][personagem_x] == 4:
-        comando = 'f'
-        print('Parabéns, você chegou ao final do labirinto!!')
 
-    labirinto[personagem_y][personagem_x] = 1
+    if (passo_novo_x >= 0 and passo_novo_x < len(labirinto[passo_novo_y]) and passo_novo_y >= 0 and passo_novo_y < len(labirinto) and  labirinto[passo_novo_y][passo_novo_x] != 2):
+
+        labirinto[personagem_y][personagem_x] = 3
+
+        
+        if labirinto[passo_novo_y][passo_novo_x] == 4:
+            comando = 'f'
+            print('Parabéns, você chegou ao final do labirinto!!')
+
+        if labirinto[passo_novo_y][passo_novo_x] == 6:
+            chaves += 1
+
+        if labirinto[passo_novo_y][passo_novo_x] == 7 and chaves > 0:
+            chaves -= 1
+
+        elif labirinto[passo_novo_y][passo_novo_x] == 7 and chaves == 0:
+            passo_novo_x = personagem_x
+            passo_novo_y = personagem_y
+
+        labirinto[passo_novo_y][passo_novo_x] = 1
+
+        personagem_x = passo_novo_x
+        personagem_y = passo_novo_y
+        
     mostrar_labirinto(labirinto, tamanho)

@@ -1,0 +1,21 @@
+import time
+
+def cronometro(segundos_totais):
+    while segundos_totais >= 0:
+        # Calcula minutos e segundos
+        mins, segs = divmod(segundos_totais, 60)
+        
+        # Formata o tempo como 00:00
+        tempo_formatado = f'{mins:02d}:{segs:02d}'
+        
+        # O segredo: \r (carriage return) volta o cursor para o início da linha
+        # end="" impede que o print pule para a próxima linha
+        print(f"Tempo restante: {tempo_formatado}", end="\r")
+        
+        time.sleep(1) # Espera 1 segundo
+        segundos_totais -= 1
+
+    print("\nTempo esgotado!          ")
+
+# Exemplo: Cronômetro de 10 segundos
+cronometro(10)
