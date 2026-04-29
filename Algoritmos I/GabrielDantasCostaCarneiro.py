@@ -7,6 +7,11 @@ import subprocess
 import random
 import time
 
+# Adicionar contador de tempo cronometro
+# Adicionar interação com objetos espada moeda e monstros
+# Ajustar espalhamento de itens
+# Colorir itens e monstros
+
 personagem_x = 0
 personagem_y = 0
 tamanho = 0
@@ -20,7 +25,7 @@ def mostrar_labirinto(labirinto, tamanho):
     for i in range(tamanho + 2):
         lateral += '\u25A0 '
 
-    #subprocess.run('cls', shell=True)
+    subprocess.run('cls', shell=True)
     print(lateral)
     for i in labirinto:
 
