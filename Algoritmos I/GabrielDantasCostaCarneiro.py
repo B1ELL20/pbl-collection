@@ -16,16 +16,36 @@ personagem_x = 0
 personagem_y = 0
 tamanho = 0
 chaves = 0
+vidas = 1
+espadas = 0
+moedas = 0
 tempo_restante = 180
+
+tempo_finalizado = False
+tempo_segundos = 0
+
+def cronometro():
+    global tempo_segundos
+    while not tempo_finalizado:
+        # No Windows use 'cls', no Linux/Mac use 'clear'
+        # Isso ajuda a manter o tempo no topo se você redesenhar a tela
+        time.sleep(1)
+        if not tempo_finalizado:
+            tempo_segundos += 1
 
 def mostrar_labirinto(labirinto, tamanho):
 
+    global vidas
+    global espadas
+    global chaves
+    global moedas
 
     lateral = ''
     for i in range(tamanho + 2):
         lateral += '\u25A0 '
 
     subprocess.run('cls', shell=True)
+    print(f'✦ : {moedas}  ⚔ : {espadas} \U0001F5DD : {chaves} vidas: {vidas}')
     print(lateral)
     for i in labirinto:
 
@@ -114,7 +134,7 @@ def gerar_labirinto(tamanho):
               labirinto[y_final][x_final - 1] = 7
     
     espacos_para_itens = []
-    
+
     # Percorremos cada coordenada que foi cavada anteriormente
     for p in caminho_lista:
         x = p[0]
@@ -124,26 +144,39 @@ def gerar_labirinto(tamanho):
         # Isso evita colocar itens em cima do personagem (1), da chegada (4) ou porta (7)
         if labirinto[y][x] == 3:
             espacos_para_itens.append(p)
+    
+
+    terco = len(espacos_para_itens) // 3
+
+    zona_perto = espacos_para_itens[:terco]
+    zona_meio = espacos_para_itens[terco:-terco]
+    zona_longe = espacos_para_itens[-terco:]
+
+    random.shuffle(zona_perto)
+    random.shuffle(zona_meio)
+    random.shuffle(zona_longe)
 
 
     # ZONA PERTO (Início da lista) -> ESPADAS (9)
     for i in range(quantidade):
-        pos = espacos_para_itens.pop(0) # Pega os primeiros elementos
+        pos = zona_perto.pop(0) # Pega os primeiros elementos
         labirinto[pos[1]][pos[0]] = 9
 
     # ZONA LONGE (Final da lista) -> MONSTROS (8)
     for i in range(quantidade):
-        pos = espacos_para_itens.pop() # Pega os últimos elementos
+        pos = zona_longe.pop() # Pega os últimos elementos
         labirinto[pos[1]][pos[0]] = 8
 
     # CHAVE (6) - Sorteamos uma posição que sobrou no meio
-    pos_chave = espacos_para_itens.pop(len(espacos_para_itens) // 2)
+    pos_chave = zona_meio.pop(len(zona_meio) // 2)
     labirinto[pos_chave[1]][pos_chave[0]] = 6
 
     # MOEDAS (5) - Sorteamos em qualquer lugar que sobrou
-    random.shuffle(espacos_para_itens)
+
+    sobras = zona_perto + zona_meio + zona_longe
+    random.shuffle(sobras)
     for i in range(quantidade):
-        pos = espacos_para_itens.pop()
+        pos = sobras.pop()
         labirinto[pos[1]][pos[0]] = 5
 
     for i in range(tamanho):
@@ -216,6 +249,18 @@ while comando != 'f':
 
         if labirinto[passo_novo_y][passo_novo_x] == 6:
             chaves += 1
+        
+        if labirinto[passo_novo_y][passo_novo_x] == 5:
+            moedas += 1
+
+        if labirinto[passo_novo_y][passo_novo_x] == 9:
+            espadas += 1
+        
+        if labirinto[passo_novo_y][passo_novo_x] == 8 and espadas > 0:
+            espadas -= 1
+
+        elif labirinto[passo_novo_y][passo_novo_x] == 8 and espadas == 0:
+            vidas -= 1
 
         if labirinto[passo_novo_y][passo_novo_x] == 7 and chaves > 0:
             chaves -= 1
