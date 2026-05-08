@@ -3,10 +3,6 @@
 # Aluno: Gabriel Dantas Costa Carneiro // Matrícula: 26111296
 # Professora: Michele Fúlvia Angelo
 
-
-# ADICIONAR ITEM DE PICARETA
-# FAZER CÁLCULO DA PUNTUAÇÃO FINAL ATRAVÉS DE MOEDAS TEMPO
-
 # Importação de bibliotecas
 
 import subprocess
@@ -20,34 +16,36 @@ from pynput import keyboard
 personagem_x = 0
 personagem_y = 0
 tamanho = 0
+quantidade = 0
 chaves = 0
 vidas = 1
 espadas = 0
 moedas = 0
-tempo_finalizado = False
+picaretas = 0
+jogo_finalizado = False
+tempo = 0
+tempo_segundos = 0
 caminho_percorrido = []
 
 # Função cronometro
 
-def cronometro():
+def cronometro():\
 
-    global tempo_finalizado
+    global jogo_finalizado, tempo_segundos
 
-    tempo_segundos = 180
-
-    while not tempo_finalizado:
+    while not jogo_finalizado:
 
         minutos = tempo_segundos // 60
         segundos = tempo_segundos % 60
 
-        status = f" TEMPO: {minutos:02d}:{segundos:02d} | VIDAS: {vidas} | MOEDAS: {moedas} | ESPADAS: {espadas} | CHAVES: {chaves}"
+        status = f" \033[32mTEMPO: {minutos:02d}:{segundos:02d}\033[0m | \033[31mVIDAS: {vidas}\033[0m | \033[33mMOEDAS: {moedas}\033[0m | \033[34mESPADAS: {espadas}\033[0m | \033[33mCHAVES: {chaves}\033[0m"
         
-        print(f"\033[s\033[H\033[32m{status}\033[0m\033[K\033[u", end="", flush=True)
+        print(f"\033[s\033[H{status}\033[K\033[u", end="", flush=True)
 
         time.sleep(1)
         tempo_segundos -= 1
         if tempo_segundos == 0:
-            tempo_finalizado = True
+            jogo_finalizado = True
 
 
 def mostrar_labirinto(labirinto, tamanho):
@@ -78,12 +76,14 @@ def mostrar_labirinto(labirinto, tamanho):
                 .replace('7', '\033[31m\u25A0\033[0m')
                 .replace('8', '\033[35m🕷\033[0m')
                 .replace('9', '\033[34m⚔\033[0m') 
-                .replace('*', '\033[34m\u25CF\033[0m')+ '\u25A0')
+                .replace('P', '\033[32m⛏\033[0m') 
+                .replace('C', '\033[31m❦\033[0m') 
+                .replace('*', '\033[34m*\033[0m')+ '\u25A0')
     print(borda)
 
 def gerar_labirinto(tamanho):
 
-    global personagem_x, personagem_y
+    global personagem_x, personagem_y, quantidade
 
     quantidades_por_tamanho = {15: 2, 19: 3, 23: 4}
     quantidade = quantidades_por_tamanho.get(tamanho, 1)
@@ -123,7 +123,7 @@ def gerar_labirinto(tamanho):
             
             if passos_x >= 0 and passos_x < tamanho and passos_y >= 0 and passos_y < tamanho and labirinto[passos_y][passos_x] == 'X':
                 labirinto[y + direcao_y // 2][x + direcao_x // 2] = 3
-                caminho_lista.append((x + direcao_x // 2, y + direcao_y // 2))
+                caminho_lista.append((y + direcao_y // 2, x + direcao_x // 2))
                 cavar_caminho(passos_x, passos_y)
     
     cavar_caminho(personagem_x, personagem_y)
@@ -149,12 +149,9 @@ def gerar_labirinto(tamanho):
     
     espacos_para_itens = []
 
-
     for p in caminho_lista:
-        x = p[0]
-        y = p[1]
 
-        if labirinto[y][x] == 3:
+        if labirinto[p[0]][p[1]] == 3:
             espacos_para_itens.append(p)
     
     terco = len(espacos_para_itens) // 3
@@ -175,23 +172,30 @@ def gerar_labirinto(tamanho):
         if espadas_colocadas == 0:
             pos = zona_perto.pop()
             espadas_colocadas += 1
+            labirinto[pos[0]][pos[1]] = 9
+            
         else:
             pos = zona_restante.pop()
-
-        labirinto[pos[1]][pos[0]] = 9
+            labirinto[pos[0]][pos[1]] = 9
 
     for i in range(quantidade):
         pos = zona_restante.pop()
-        labirinto[pos[1]][pos[0]] = 8
+        labirinto[pos[0]][pos[1]] = 8
 
     pos_chave = zona_meio.pop(len(zona_meio) // 2)
-    labirinto[pos_chave[1]][pos_chave[0]] = 6
+    labirinto[pos_chave[0]][pos_chave[1]] = 6
+
+    pos_pic = zona_perto.pop()
+    labirinto[pos_pic[0]][pos_pic[1]] = 'P'
 
     sobras = zona_perto + zona_restante
     random.shuffle(sobras)
     for i in range(quantidade):
         pos = sobras.pop()
-        labirinto[pos[1]][pos[0]] = 5
+        labirinto[pos[0]][pos[1]] = 5
+
+    pos_comida = sobras.pop()
+    labirinto[pos_comida[0]][pos_comida[1]] = 'C'
 
     for i in range(tamanho):
         for j in range(tamanho):
@@ -203,10 +207,10 @@ def gerar_labirinto(tamanho):
 
 def input_key(key):
 
-    global personagem_x, personagem_y, tempo_finalizado, vidas, moedas, chaves, espadas
+    global personagem_x, personagem_y, jogo_finalizado, vidas, moedas, chaves, espadas, picaretas
     global caminho_percorrido
 
-    if tempo_finalizado:
+    if jogo_finalizado:
         return False
 
     comando = ''
@@ -217,7 +221,7 @@ def input_key(key):
         comando = key.name
 
     if comando == 'esc':
-        tempo_finalizado = True
+        jogo_finalizado = True
         return False
     
     passo_novo_x = personagem_x
@@ -242,23 +246,32 @@ def input_key(key):
             return
     
     
-    if (passo_novo_x >= 0 and passo_novo_x < len(labirinto) and passo_novo_y >= 0 and passo_novo_y < len(labirinto) and  labirinto[passo_novo_y][passo_novo_x] != 2):
+    if (passo_novo_x >= 0 and passo_novo_x < len(labirinto) 
+        and passo_novo_y >= 0 and passo_novo_y < len(labirinto) 
+        and ((labirinto[passo_novo_y][passo_novo_x] != 2) or picaretas > 0)):
 
         labirinto[personagem_y][personagem_x] = 3
-
         
         if labirinto[passo_novo_y][passo_novo_x] == 4:
-            print('Parabéns, você chegou ao final do labirinto!!')
             return False
 
         if labirinto[passo_novo_y][passo_novo_x] == 6:
             chaves += 1
+        
+        if labirinto[passo_novo_y][passo_novo_x] == 'C':
+            vidas += 1
         
         if labirinto[passo_novo_y][passo_novo_x] == 5:
             moedas += 1
 
         if labirinto[passo_novo_y][passo_novo_x] == 9:
             espadas += 1
+        
+        if labirinto[passo_novo_y][passo_novo_x] == 'P':
+            picaretas += 1
+
+        if labirinto[passo_novo_y][passo_novo_x] == 2 and picaretas > 0:
+            picaretas -= 1
         
         if labirinto[passo_novo_y][passo_novo_x] == 8 and espadas > 0:
             espadas -= 1
@@ -290,9 +303,10 @@ print('AQUI ESTÃO AS REGRAS PARA EMBARCAR NESSA AVENTURA:')
 print('-> ANDE PELO LABIRINTO COM AS TECLAS W(CIMA), A(ESQUERDA), S(BAIXO), D(DIREITA)')
 print('-> SEU OBJETIVO É SUPERAR OS MONSTROS \033[35m🕷\033[0m , ENCONTRAR A CHAVE \033[33m\U0001F5DD\033[0m  E DESTRANCAR A PORTA FINAL \033[31m\u25A0\033[0m')
 print('-> SE CONSEGUIR A ESFERA VERMELHA \033[31m\u25CF\033[0m, VOCÊ CONSEGUE A LIBERDADE DO LABIRINTO')
-print('-> MAS CUIDADO! SE OS MONSTROS TE ENCONTRAREM SEM ESPADAS \033[34m⚔\033[0m , PODE SER RUIM PRA VOCÊ!')
-print('-> NO LABIRINTO EXISTEM MOEDAS \033[33m✦\033[0m QUE CONTAM NA SUA PONTUAÇÃO, ASSIM COMO ESPADAS PARA SE DEFENDER')
-print('-> EXISTE UM ITEM ESPECIAL DE PICARETA, QUE LHE PERMITE QUEBRAR QUALQUER PAREDE UMA ÚNICA VEZ')
+print('-> MAS CUIDADO! SE OS MONSTROS TE ENCONTRAREM SEM ESPADAS \033[34m⚔\033[0m , PODE SER RUIM PRA VOCÊ')
+print('-> NO LABIRINTO O TEMPO E A MOEDAS \033[33m✦\033[0m CONTAM NA SUA PONTUAÇÃO')
+print('-> EXISTE UM ITEM ESPECIAL DE PICARETA \033[32m⛏\033[0m , QUE LHE PERMITE QUEBRAR QUALQUER PAREDE UMA ÚNICA VEZ')
+print('-> EXISTE UM ITEM ESPECIAL FRUTA CORAÇÃO \033[31m❦\033[0m, QUE LHE DÁ UMA VIDA EXTRA')
 print('-> POR FIM, CUIDADO COM O TEMPO, SEJA ÁGIL E SAIA O QUANTO ANTES!')
 print('AGORA CHEGA DE CONVERSA! ESCOLHA O TAMANHO DO MAPA QUE DESEJA ENCARAR!')
 
@@ -309,12 +323,18 @@ while valor not in ['1', '2', '3']:
 
 if valor == '1':
     tamanho = 15
+    tempo = 50
+    tempo_segundos = 50
 
 elif valor == '2':
     tamanho = 19
+    tempo = 90
+    tempo_segundos = 90
 
 else:
     tamanho = 23
+    tempo = 120
+    tempo_segundos = 120
 
 labirinto = gerar_labirinto(tamanho)
 
@@ -331,11 +351,28 @@ for y, x in caminho_percorrido:
     labirinto[y][x] = '*'
     mostrar_labirinto(labirinto, tamanho)
 
-if vidas == 0:
-    print('OS MONSTROS TE PEGARAM, MAIS SORTE DA PRÓXIMA VEZ!')
-
-elif tempo_finalizado: 
-    print('TEMPO ESGOTADO! NÃO FOI DESSA VEZ!')
+if jogo_finalizado and tempo_segundos > 0:
+    print('Vai fugir? Até mais, volte sempre! >:)')
 
 else:
-    print('VOCÊ CONSEGUIU FUGIR DO LABIRINTO! PARABÉNS!!!')
+    if vidas == 0:
+        print('OS MONSTROS TE PEGARAM, MAIS SORTE DA PRÓXIMA VEZ!')
+
+    elif tempo_segundos <= 0: 
+        print('TEMPO ESGOTADO! NÃO FOI DESSA VEZ!')
+
+    else:
+        desempenho = 0
+
+        if tempo_segundos >= tempo / 2:
+            desempenho = (100 + ((moedas / quantidade) * 100)) / 2
+
+        else: 
+            desempenho = (((tempo_segundos / (tempo / 2)) * 100) + ((moedas / quantidade) * 100)) / 2
+        
+        minutos = tempo_segundos // 60
+        segundos = tempo_segundos % 60
+
+        print(f"Você concluiu o labirinto com desempenho de {desempenho:.0f}%")
+        print(f'Pegou {moedas} moedas e concluiu em {minutos:02d}:{segundos:02d}')
+        print('VOCÊ CONSEGUIU FUGIR DO LABIRINTO! PARABÉNS!!!')
