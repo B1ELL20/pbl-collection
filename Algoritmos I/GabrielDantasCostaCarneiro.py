@@ -1,5 +1,5 @@
 # Código do problema 02 do PBL de Algoritmos: fuga do labirinto
-# Código desenvolvido único e exclusivamente por Gabriel Dantas Costa Carneiro sem utilização de ferramentas de inteligência artificial
+# Código desenvolvido único e exclusivamente por Gabriel Dantas Costa Carneiro sem utilização indevida de ferramentas de inteligência artificial
 # Aluno: Gabriel Dantas Costa Carneiro // Matrícula: 26111296
 # Professora: Michele Fúlvia Angelo
 
@@ -27,9 +27,9 @@ tempo = 0
 tempo_segundos = 0
 caminho_percorrido = []
 
-# Função cronometro
+# Função cronometro para contagem regressiva e visualização de status
 
-def cronometro():\
+def cronometro():
 
     global jogo_finalizado, tempo_segundos
 
@@ -47,6 +47,7 @@ def cronometro():\
         if tempo_segundos == 0:
             jogo_finalizado = True
 
+# Função para visualização do labirinto
 
 def mostrar_labirinto(labirinto, tamanho):
 
@@ -78,8 +79,30 @@ def mostrar_labirinto(labirinto, tamanho):
                 .replace('9', '\033[34m⚔\033[0m') 
                 .replace('P', '\033[32m⛏\033[0m') 
                 .replace('C', '\033[31m❦\033[0m') 
-                .replace('*', '\033[34m*\033[0m')+ '\u25A0')
+                .replace('*', '\033[34m*\033[0m') + '\u25A0')
     print(borda)
+
+# Declaração da função recursiva para "cavar" e registrar os caminhos do labirinto gerados aleatoriamente
+
+def cavar_caminho(x, y, inicial_x, inicial_y, tamanho_matriz, caminho_lista, matriz_labirinto):
+
+        if x != inicial_x or y != inicial_y:
+            matriz_labirinto[y][x] = 3 
+            caminho_lista.append((y, x))
+        
+        direcoes = [(0, 2), (0, -2), (2, 0), (-2, 0)]
+        random.shuffle(direcoes)
+        
+        for direcao_x, direcao_y in direcoes:
+            passos_x = x + direcao_x
+            passos_y = y + direcao_y
+            
+            if passos_x >= 0 and passos_x < tamanho_matriz and passos_y >= 0 and passos_y < tamanho_matriz and matriz_labirinto[passos_y][passos_x] == 'X':
+                matriz_labirinto[y + direcao_y // 2][x + direcao_x // 2] = 3
+                caminho_lista.append((y + direcao_y // 2, x + direcao_x // 2))
+                cavar_caminho(passos_x, passos_y, inicial_x, inicial_y, tamanho_matriz, caminho_lista, matriz_labirinto)
+
+# Função para geração do labirinto
 
 def gerar_labirinto(tamanho):
 
@@ -87,6 +110,8 @@ def gerar_labirinto(tamanho):
 
     quantidades_por_tamanho = {15: 2, 19: 3, 23: 4}
     quantidade = quantidades_por_tamanho.get(tamanho, 1)
+
+    # Matriz inicial gerada contendo apenas X
 
     labirinto = []
     for i in range(tamanho):
@@ -97,37 +122,28 @@ def gerar_labirinto(tamanho):
 
         labirinto.append(linha)
 
+    # Definição da posição inicial do personagem
+
     personagem_x = random.choice([0, tamanho - 1])
     personagem_y = random.choice([0, tamanho - 1])
 
     labirinto[personagem_y][personagem_x] = 1
     caminho_percorrido.append((personagem_y, personagem_x))
 
+    # Definição da posição da saída
+
     x_final = abs(personagem_x - (tamanho - 1))
     y_final = abs(personagem_y - (tamanho - 1))
 
-    caminho_lista = []
-
-    def cavar_caminho(x, y):
-
-        if x != personagem_x or y != personagem_y:
-            labirinto[y][x] = 3 
-            caminho_lista.append((x, y))
-        
-        direcoes = [(0, 2), (0, -2), (2, 0), (-2, 0)]
-        random.shuffle(direcoes)
-        
-        for direcao_x, direcao_y in direcoes:
-            passos_x = x + direcao_x
-            passos_y = y + direcao_y
-            
-            if passos_x >= 0 and passos_x < tamanho and passos_y >= 0 and passos_y < tamanho and labirinto[passos_y][passos_x] == 'X':
-                labirinto[y + direcao_y // 2][x + direcao_x // 2] = 3
-                caminho_lista.append((y + direcao_y // 2, x + direcao_x // 2))
-                cavar_caminho(passos_x, passos_y)
+    caminho = []
     
-    cavar_caminho(personagem_x, personagem_y)
+    # Execução inicial da função cavar_caminho recebendo como parâmetro as posições iniciais do jogador
+    cavar_caminho(personagem_x, personagem_y, personagem_x, personagem_y, tamanho, caminho, labirinto)
+
+    # Atribuit o valor da saída nas coordenadas da saída
     labirinto[y_final][x_final] = 4
+
+    # Atribuir portas ao redos da saída, conforme posição
 
     if y_final == 0:
          
@@ -147,9 +163,12 @@ def gerar_labirinto(tamanho):
          if labirinto[y_final][x_final - 1] == 3:
               labirinto[y_final][x_final - 1] = 7
     
+
+    # Criação de zonas para distribuição aleatória de itens
+
     espacos_para_itens = []
 
-    for p in caminho_lista:
+    for p in caminho:
 
         if labirinto[p[0]][p[1]] == 3:
             espacos_para_itens.append(p)
@@ -159,43 +178,57 @@ def gerar_labirinto(tamanho):
     zona_perto = espacos_para_itens[:terco]
     zona_meio = espacos_para_itens[terco:-terco]
     zona_restante = espacos_para_itens[terco:]
-    #zona_longe = espacos_para_itens[-terco:]
 
     random.shuffle(zona_perto)
     random.shuffle(zona_restante)
     random.shuffle(zona_meio)
+
+    # Distribuição de itens em cada zona aplicada logicamente
+
+    # Distribuição de espadas
 
     espadas_colocadas = 0
 
     for i in range(quantidade):
 
         if espadas_colocadas == 0:
-            pos = zona_perto.pop()
+            pos_espada = zona_perto.pop()
             espadas_colocadas += 1
-            labirinto[pos[0]][pos[1]] = 9
+            labirinto[pos_espada[0]][pos_espada[1]] = 9
             
         else:
-            pos = zona_restante.pop()
-            labirinto[pos[0]][pos[1]] = 9
+            pos_espada = zona_restante.pop()
+            labirinto[pos_espada[0]][pos_espada[1]] = 9
+
+    # Distribuição de monstros
 
     for i in range(quantidade):
-        pos = zona_restante.pop()
-        labirinto[pos[0]][pos[1]] = 8
+        pos_monstro = zona_restante.pop()
+        labirinto[pos_monstro[0]][pos_monstro[1]] = 8
+    
+    # Distribuição da chave
 
-    pos_chave = zona_meio.pop(len(zona_meio) // 2)
+    pos_chave = zona_meio.pop()
     labirinto[pos_chave[0]][pos_chave[1]] = 6
 
-    pos_pic = zona_perto.pop()
-    labirinto[pos_pic[0]][pos_pic[1]] = 'P'
+    # Distribuição da picareta
 
-    sobras = zona_perto + zona_restante
-    random.shuffle(sobras)
+    pos_picareta = zona_perto.pop()
+    labirinto[pos_picareta[0]][pos_picareta[1]] = 'P'
+
+    # Distribuição das moedas
+
+    random.shuffle(zona_restante)
     for i in range(quantidade):
-        pos = sobras.pop()
-        labirinto[pos[0]][pos[1]] = 5
+        pos_moedas= zona_restante.pop()
+        labirinto[pos_moedas[0]][pos_moedas[1]] = 5
+    
+    # Distribuição da comida
 
-    pos_comida = sobras.pop()
+    pos_comida = zona_restante.pop()
     labirinto[pos_comida[0]][pos_comida[1]] = 'C'
+
+    # Substituição dos valores X que sobram pelo valor da parede
 
     for i in range(tamanho):
         for j in range(tamanho):
@@ -205,20 +238,25 @@ def gerar_labirinto(tamanho):
 
     return labirinto
 
-def input_key(key):
+# Função para leitura das entradas via teclado
 
-    global personagem_x, personagem_y, jogo_finalizado, vidas, moedas, chaves, espadas, picaretas
-    global caminho_percorrido
+def entrada_de_comando(key):
+
+    global personagem_x, personagem_y, jogo_finalizado, vidas, moedas, chaves, espadas, picaretas, caminho_percorrido
 
     if jogo_finalizado:
         return False
 
     comando = ''
 
+    # Tenta receber o comando, caso contrário, recebe o nome do comando pressionado
+
     try:
         comando = key.char.lower()
     except:
         comando = key.name
+
+    # Caso esc, finaliza o jogo
 
     if comando == 'esc':
         jogo_finalizado = True
@@ -226,6 +264,8 @@ def input_key(key):
     
     passo_novo_x = personagem_x
     passo_novo_y = personagem_y
+
+    # Caso algum comando válido, anda para a posição correspondente
 
     match comando.lower():
 
@@ -246,6 +286,8 @@ def input_key(key):
             return
     
     
+    # Valida a possibilidade do comando digitado e caso possível, realiza interação com o elemento encontrado
+
     if (passo_novo_x >= 0 and passo_novo_x < len(labirinto) 
         and passo_novo_y >= 0 and passo_novo_y < len(labirinto) 
         and ((labirinto[passo_novo_y][passo_novo_x] != 2) or picaretas > 0)):
@@ -296,7 +338,11 @@ def input_key(key):
 
         caminho_percorrido.append((personagem_y, personagem_x))
 
+    # Mostra o labirinto atualizado
+
     mostrar_labirinto(labirinto, tamanho)
+
+# Apresentação das regras do jogo
 
 print('BEM VINDO(A) AO LABIRINTO!')
 print('AQUI ESTÃO AS REGRAS PARA EMBARCAR NESSA AVENTURA:')
@@ -310,21 +356,26 @@ print('-> EXISTE UM ITEM ESPECIAL FRUTA CORAÇÃO \033[31m❦\033[0m, QUE LHE D�
 print('-> POR FIM, CUIDADO COM O TEMPO, SEJA ÁGIL E SAIA O QUANTO ANTES!')
 print('AGORA CHEGA DE CONVERSA! ESCOLHA O TAMANHO DO MAPA QUE DESEJA ENCARAR!')
 
+# Apresentação do menu para escolha do tamanho do labirinto
+
 print('--------------------------------------------------------------------------------------------------------------------------')
 print('[1] - 15X15 -> UM MAPA PARA AMADORES')
 print('[2] - 19X19 -> AQUI AS COISA JÁ NÃO SÃO TÃO SIMPLES')
 print('[3] - 23X23 -> SE ESCOLHER É PORQUE SE GARANTE')
 print('--------------------------------------------------------------------------------------------------------------------------')
+
 valor = input('\nEscolha o tamanho do labirinto(1, 2 ou 3): ')
 
 while valor not in ['1', '2', '3']:
     print('Escolha uma opção válida!')
     valor = input('Escolha o tamanho do labirinto: ')
 
+# Valores atribuídos conforme valor escolhido
+
 if valor == '1':
     tamanho = 15
-    tempo = 50
-    tempo_segundos = 50
+    tempo = 60
+    tempo_segundos = 60
 
 elif valor == '2':
     tamanho = 19
@@ -336,20 +387,32 @@ else:
     tempo = 120
     tempo_segundos = 120
 
+# Geração da matriz do labirinto atribuindo em uma variável
+
 labirinto = gerar_labirinto(tamanho)
+
+# Aplicação do cronômetro em uma thread
 
 t = threading.Thread(target=cronometro, daemon=True)
 t.start()
 
+# Primeira visualização do labirinto
+
 mostrar_labirinto(labirinto, tamanho)
 
-with keyboard.Listener(on_press=input_key) as listener:
+# Listener para ouvir comandos vindos do teclado enquanto labirinto já foi executado
+
+with keyboard.Listener(on_press=entrada_de_comando) as listener:
     listener.join()
+
+# Visualização do caminho percorrido pelo jogador
 
 for y, x in caminho_percorrido:
 
     labirinto[y][x] = '*'
     mostrar_labirinto(labirinto, tamanho)
+
+# Mensagens conforme condição de parada do sistema
 
 if jogo_finalizado and tempo_segundos > 0:
     print('Vai fugir? Até mais, volte sempre! >:)')
@@ -374,5 +437,5 @@ else:
         segundos = tempo_segundos % 60
 
         print(f"Você concluiu o labirinto com desempenho de {desempenho:.0f}%")
-        print(f'Pegou {moedas} moedas e concluiu em {minutos:02d}:{segundos:02d}')
+        print(f'Pegou {moedas}/{quantidade} moedas e concluiu faltando {minutos:02d}:{segundos:02d} para acabar!')
         print('VOCÊ CONSEGUIU FUGIR DO LABIRINTO! PARABÉNS!!!')
