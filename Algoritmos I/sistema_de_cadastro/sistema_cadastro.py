@@ -4,37 +4,74 @@
 # Professora: Michele Fúlvia Angelo
 
 import json
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent
 
 # Variáveis e constantes globais de controle do sistema
 system_on = True
-ARQUIVO_JOGADORES = "jogadores.json"
+PLAYERS_ARCHIVE = BASE_DIR / "jogadores.json"
+MATCHS_ARCHIVE = BASE_DIR / "partidas.json"
 
-def carregar_jogadores():
+def fetch_players():
+
     lista_jogadores = []
+
     try:
-        # Abre o arquivo para leitura
-        with open("jogadores.json", "r", encoding="utf-8") as f:
-            dados_do_arquivo = json.load(f)  # Carrega a lista de dicionários
+        with open(PLAYERS_ARCHIVE, "r", encoding="utf-8") as f:
+            dados_do_arquivo = json.load(f) 
             
-            # Converte cada dicionário de volta para um objeto Player
             for dados in dados_do_arquivo:
-                # 1. Cria o objeto apenas com o id e o nome (como o __init__ exige)
                 jogador = Player(dados["id"], dados["name"])
                 
-                # 2. Restaura os outros atributos que estavam salvos
+
                 jogador.victories = dados["victories"]
                 jogador.defeats = dados["defeats"]
                 jogador.draws = dados["draws"]
                 jogador.score = dados["score"]
                 
-                # 3. Adiciona o objeto pronto na lista
                 lista_jogadores.append(jogador)
                 
     except FileNotFoundError:
-        # Se o arquivo não existir (primeira execução), retorna a lista vazia
         return []
         
     return lista_jogadores
+
+
+def fetch_matchs():
+
+    matchs_list = []
+
+    try:
+
+        with open(MATCHS_ARCHIVE, "r", encoding="utf-8") as f:
+            dados_do_arquivo = json.load(f)  
+            
+            for dados in dados_do_arquivo:
+
+                match = Match(
+                    dados["id"],
+                    dados["player1_id"],
+                    dados["player2_id"],
+                    dados["draw"],
+                    dados["winner_id"])
+
+                matchs_list.append(match)
+                
+    except FileNotFoundError:
+
+        return []
+        
+    return matchs_list
+
+
+def ranking_players(players):
+
+    return sorted(
+        players,
+        key=lambda player: (player.score, player.victories),
+        reverse=True
+    )
 
 class Player:
 
@@ -50,9 +87,16 @@ class Player:
         return self.__dict__
 
 class Match:
-    def __init__(self, player1_id, player2_id):
-        self.player1 = player1_id
-        self.player1 = player2_id
+
+    def __init__(self, id, player1_id, player2_id, draw, winner_id):
+        self.id = id
+        self.player1_id = player1_id
+        self.player2_id = player2_id
+        self.draw = draw
+        self.winner_id = winner_id
+    
+    def for_dict(self):
+        return self.__dict__
 
 
 def show_menu():
@@ -73,8 +117,7 @@ while system_on:
 
         case "1":
             new_players = []
-            print("\n[Você escolheu: Cadastrar um jogador]")
-            jogadores_registrados = carregar_jogadores()
+            jogadores_registrados = fetch_players()
             name = input("Digite o nome do jogador: ")
 
             if len(jogadores_registrados) > 0:
@@ -100,18 +143,124 @@ while system_on:
                 jogador = Player(1, name)
                 new_players = [jogador.for_dict()]
 
-            with open("jogadores.json", "w") as f:
+            with open(PLAYERS_ARCHIVE, "w") as f:
                 json.dump(new_players, f, indent=4)
 
-        case "1":
-            print("\n[Você escolheu: Cadastrar um jogador]")
-        case "1":
-            print("\n[Você escolheu: Cadastrar um jogador]")
-        case "1":
-            print("\n[Você escolheu: Cadastrar um jogador]")
-        case "1":
-            print("\n[Você escolheu: Cadastrar um jogador]")
-        case "1":
-            print("\n[Você escolheu: Cadastrar um jogador]")
+        case "2":
+
+            new_matchs = []
+            new_players = []
+            players = fetch_players()
+            winner_id = 0
+            register_matchs = fetch_matchs()
+
+            player1_id = input('Digite o id do primeiro jogador: ')
+            player2_id = input('Digite o id do segundo jogador: ')
+
+            player1 = False
+            player2 = False
+
+            for player in players:
+
+                if player.id == int(player1_id):
+                    player1 = player
+                
+                if player.id == int(player2_id):
+                    player2 = player
+
+            if player1 != False and player2 != False:
+
+                draw = input('Houve empate? (s/n)')
+
+                if draw.lower() == 's':
+                    draw = True
+                    player1.draws += 1
+                    player1.score += 1
+                    player2.draws += 1
+                    player2.score += 1
+
+                else:
+                    draw = False
+                    print(f'Jogador 1: {player1_id} | Jogador 2: {player2_id}')
+                    winner = input('Qual jogador que venceu? (1/2)')
+
+                    if winner == '1':
+                        winner_id = player1_id
+                        player1.victories += 1
+                        player1.score += 3
+                        player2.defeats += 1
+                        player2.score -= 1 if player2.score > 0 else 0
+
+                    else:
+                        winner_id = player2_id                           
+                        player2.victories += 1
+                        player2.score += 3
+                        player1.defeats += 1
+                        player1.score -= 1 if player1.score > 0 else 0 
+
+                
+                id_max = 0
+                if len(register_matchs) > 0:
+                    for match in register_matchs:
+                        if match.id > id_max:
+                            id_max = match.id
+
+                new_match = Match(id_max + 1, player1_id, player2_id, draw, winner_id)
+                new_matchs = [match.for_dict() for match in register_matchs]
+                new_matchs.append(new_match.for_dict())
+
+                for player in players:
+
+                    if player.id != int(player1_id) and player.id != int(player2_id):
+                        new_players.append(player.for_dict())
+                
+                new_players.append(player1.for_dict())
+                new_players.append(player2.for_dict())
+
+                with open(MATCHS_ARCHIVE, "w") as f:
+                    json.dump(new_matchs, f, indent=4)
+
+                with open(PLAYERS_ARCHIVE, "w") as f:
+                    json.dump(new_players, f, indent=4)
+            else:
+                print('Ids especificados não existem!')
+
+
+        case "3":
+
+            players = fetch_players()
+            id = input('Digite o id do jogador que deseja consultar: ') # Validar inteiros
+
+            exists_player = False
+            for player in players:
+                if player.id == int(id):
+                    exists_player = True
+                    print(f'Id: {player.id}')
+                    print(f'Nome: {player.name}')
+                    print(f'Vitórias: {player.victories}')
+                    print(f'Derrotas: {player.defeats}')
+                    print(f'Empates: {player.draws}')
+                    print(f'Pontuação: {player.score}')
+
+            if not exists_player:
+                print('O jogador especificado não existe!')
+            
+        case "4":
+            players = fetch_players()
+            ranking = ranking_players(players)
+
+            print('RANKING DE JOGADORES')
+
+            for player in players:
+                print(f'{player.name} | {player.score} | {player.victories} | {player.draws} | {player.defeats}')
+
+        case "5":
+            print("Imprimir Relatório")
+
+        case "6":
+
+            system_on = False
+            print("Você finalizou o sistema! Até mais!")
+
         case _:
-            print("\n[Você escolheu: Cadastrar um jogador]")
+            print('Digite um comando válido!')

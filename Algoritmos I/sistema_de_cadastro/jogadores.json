@@ -2,17 +2,17 @@
     {
         "id": 1,
         "name": "Junin",
-        "victories": 0,
-        "defeats": 0,
-        "draws": 0,
-        "score": 0
+        "victories": 1,
+        "defeats": 1,
+        "draws": 2,
+        "score": 4
     },
     {
         "id": 2,
         "name": "Kleber",
-        "victories": 0,
-        "defeats": 0,
-        "draws": 0,
-        "score": 0
+        "victories": 1,
+        "defeats": 1,
+        "draws": 2,
+        "score": 4
     }
 ]

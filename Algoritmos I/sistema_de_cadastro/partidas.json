@@ -1,0 +1,37 @@
+[
+    {
+        "id": 1,
+        "player1_id": "1",
+        "player2_id": "2",
+        "draw": false,
+        "winner_id": "1"
+    },
+    {
+        "id": 2,
+        "player1_id": "1",
+        "player2_id": "2",
+        "draw": true,
+        "winner_id": 0
+    },
+    {
+        "id": 3,
+        "player1_id": "1",
+        "player2_id": "2",
+        "draw": true,
+        "winner_id": 0
+    },
+    {
+        "id": 4,
+        "player1_id": "1",
+        "player2_id": "2",
+        "draw": false,
+        "winner_id": "1"
+    },
+    {
+        "id": 5,
+        "player1_id": "1",
+        "player2_id": "2",
+        "draw": false,
+        "winner_id": "2"
+    }
+]
