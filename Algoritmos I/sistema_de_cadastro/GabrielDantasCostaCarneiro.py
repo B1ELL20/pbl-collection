@@ -1,5 +1,5 @@
-# Código do problema 01 do PBL de Algoritmos: ponto de autoatendimento do restaurante universitário da UEFS 
-# Código desenvolvido único e exclusivamente por Gabriel Dantas Costa Carneiro sem utilização de ferramentas de inteligência artificial
+# Código do problema 03 do PBL de Algoritmos: sistema Maze Masters 
+# Código desenvolvido único e exclusivamente por Gabriel Dantas Costa Carneiro sem utilização indevida de ferramentas de inteligência artificial
 # Aluno: Gabriel Dantas Costa Carneiro // Matrícula: 26111296
 # Professora: Michele Fúlvia Angelo
 
@@ -67,11 +67,23 @@ def fetch_matchs():
 
 def ranking_players(players):
 
-    return sorted(
-        players,
-        key=lambda player: (player.score, player.victories),
-        reverse=True
-    )
+    tamanho = len(players)
+    for i in range(0, tamanho-1):
+        min = i
+        for j in range(i+1, tamanho):
+
+            if players[j].score > players[min].score:
+                min = j
+            elif players[j].score == players[min].score and players[j].victories > players[min].victories:
+                min = j
+            elif players[j].victories == players[min].victories and players[j].draws > players[min].draws:
+                min = j
+            elif players[j].draws == players[min].draws and players[j].defeats < players[min].defeats:
+                min = j
+
+        players[i], players[min] = players[min], players[i]
+
+    return players
 
 class Player:
 
@@ -251,8 +263,19 @@ while system_on:
 
             print('RANKING DE JOGADORES')
 
+            print("\n" + "=" * 80)
+            print(f"{'Jogador':<20} {'Pontos':<10} {'Vitórias':<10} {'Empates':<10} {'Derrotas':<10}")
+            print("=" * 80)
             for player in players:
-                print(f'{player.name} | {player.score} | {player.victories} | {player.draws} | {player.defeats}')
+
+                print(
+                    f"{player.name:<20} "
+                    f"{player.score:<10} "
+                    f"{player.victories:<10} "
+                    f"{player.draws:<10} "
+                    f"{player.defeats:<10}"
+                )
+            print("\n" + "=" * 80)
 
         case "5":
             print("Imprimir Relatório")

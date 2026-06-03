@@ -3,16 +3,24 @@
         "id": 1,
         "name": "Junin",
         "victories": 1,
-        "defeats": 1,
+        "defeats": 3,
         "draws": 2,
-        "score": 4
+        "score": 2
     },
     {
         "id": 2,
         "name": "Kleber",
-        "victories": 1,
-        "defeats": 1,
+        "victories": 3,
+        "defeats": 2,
         "draws": 2,
-        "score": 4
+        "score": 9
+    },
+    {
+        "id": 3,
+        "name": "Cleiton",
+        "victories": 2,
+        "defeats": 1,
+        "draws": 0,
+        "score": 5
     }
 ]
