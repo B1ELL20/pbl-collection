@@ -1,26 +1,114 @@
 [
     {
-        "id": 1,
-        "name": "Junin",
+        "id": 3,
+        "name": "Clerivaldo",
         "victories": 1,
+        "defeats": 0,
+        "draws": 0,
+        "score": 3,
+        "history": [
+            {
+                "match_id": 6,
+                "oponent_id": 1,
+                "oponent_name": "Cleiton",
+                "result": "Ganhou"
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Adalberto",
+        "victories": 2,
+        "defeats": 0,
+        "draws": 0,
+        "score": 6,
+        "history": [
+            {
+                "match_id": 7,
+                "oponent_id": 1,
+                "oponent_name": "Cleiton",
+                "result": "Ganhou"
+            },
+            {
+                "match_id": 8,
+                "oponent_id": 2,
+                "oponent_name": "Kleber",
+                "result": "Ganhou"
+            }
+        ]
+    },
+    {
+        "id": 1,
+        "name": "Cleiton",
+        "victories": 3,
         "defeats": 3,
-        "draws": 2,
-        "score": 2
+        "draws": 1,
+        "score": 7,
+        "history": [
+            {
+                "match_id": 4,
+                "oponent_id": 2,
+                "oponent_name": "Kleber",
+                "result": "Ganhou"
+            },
+            {
+                "match_id": 5,
+                "oponent_id": 2,
+                "oponent_name": "Kleber",
+                "result": "Perdeu"
+            },
+            {
+                "match_id": 6,
+                "oponent_id": 3,
+                "oponent_name": "Clerivaldo",
+                "result": "Perdeu"
+            },
+            {
+                "match_id": 7,
+                "oponent_id": 4,
+                "oponent_name": "Adalberto",
+                "result": "Perdeu"
+            },
+            {
+                "match_id": 9,
+                "oponent_id": 2,
+                "oponent_name": "Kleber",
+                "result": "Empatou"
+            }
+        ]
     },
     {
         "id": 2,
         "name": "Kleber",
-        "victories": 3,
-        "defeats": 2,
-        "draws": 2,
-        "score": 9
-    },
-    {
-        "id": 3,
-        "name": "Cleiton",
-        "victories": 2,
-        "defeats": 1,
-        "draws": 0,
-        "score": 5
+        "victories": 1,
+        "defeats": 4,
+        "draws": 1,
+        "score": 3,
+        "history": [
+            {
+                "match_id": 4,
+                "oponent_id": 1,
+                "oponent_name": "Cleiton",
+                "result": "Perdeu"
+            },
+            {
+                "match_id": 5,
+                "oponent_id": 1,
+                "oponent_name": "Cleiton",
+                "result": "Ganhou"
+            },
+            {
+                "match_id": 8,
+                "oponent_id": 4,
+                "oponent_name": "Adalberto",
+                "result": "Perdeu"
+            },
+            {
+                "match_id": 9,
+                "oponent_id": 1,
+                "oponent_name": "Cleiton",
+                "result": "Empatou"
+            }
+        ]
     }
 ]

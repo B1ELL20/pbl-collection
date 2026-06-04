@@ -1,65 +1,65 @@
 [
     {
         "id": 1,
-        "player1_id": "1",
-        "player2_id": "2",
+        "player1_id": 1,
+        "player2_id": 2,
         "draw": false,
-        "winner_id": "1"
+        "winner_id": 1
     },
     {
         "id": 2,
-        "player1_id": "1",
-        "player2_id": "2",
-        "draw": true,
-        "winner_id": 0
+        "player1_id": 1,
+        "player2_id": 2,
+        "draw": false,
+        "winner_id": 1
     },
     {
         "id": 3,
-        "player1_id": "1",
-        "player2_id": "2",
-        "draw": true,
-        "winner_id": 0
+        "player1_id": 1,
+        "player2_id": 2,
+        "draw": false,
+        "winner_id": 1
     },
     {
         "id": 4,
-        "player1_id": "1",
-        "player2_id": "2",
+        "player1_id": 1,
+        "player2_id": 2,
         "draw": false,
-        "winner_id": "1"
+        "winner_id": 1
     },
     {
         "id": 5,
-        "player1_id": "1",
-        "player2_id": "2",
+        "player1_id": 1,
+        "player2_id": 2,
         "draw": false,
-        "winner_id": "2"
+        "winner_id": 2
     },
     {
         "id": 6,
-        "player1_id": "3",
-        "player2_id": "2",
+        "player1_id": 1,
+        "player2_id": 3,
         "draw": false,
-        "winner_id": "3"
+        "winner_id": 3
     },
     {
         "id": 7,
-        "player1_id": "1",
-        "player2_id": "2",
+        "player1_id": 1,
+        "player2_id": 4,
         "draw": false,
-        "winner_id": "2"
+        "winner_id": 4
     },
     {
         "id": 8,
-        "player1_id": "1",
-        "player2_id": "3",
+        "player1_id": 2,
+        "player2_id": 4,
         "draw": false,
-        "winner_id": "3"
+        "winner_id": 4
     },
     {
         "id": 9,
-        "player1_id": "2",
-        "player2_id": "3",
-        "draw": false,
-        "winner_id": "2"
+        "player1_id": 1,
+        "player2_id": 2,
+        "draw": true,
+        "winner_id": 0
     }
 ]
