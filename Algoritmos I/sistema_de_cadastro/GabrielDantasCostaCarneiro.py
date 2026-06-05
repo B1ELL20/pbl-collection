@@ -12,6 +12,7 @@ BASE_DIR = Path(__file__).resolve().parent
 system_on = True
 PLAYERS_ARCHIVE = BASE_DIR / "jogadores.json"
 MATCHS_ARCHIVE = BASE_DIR / "partidas.json"
+REPORT_ARCHIVE = BASE_DIR / "relatorio.txt"
 
 def input_validation_string(min_len):
 
@@ -64,6 +65,8 @@ def fetch_players():
                 jogador.defeats = dados["defeats"]
                 jogador.draws = dados["draws"]
                 jogador.score = dados["score"]
+                jogador.sequential_victories = dados["sequential_victories"]
+                jogador.max_sequential_victories = dados["max_sequential_victories"]
 
                 for h in dados["history"]:
                     history = History(h["match_id"], h["oponent_id"], h["oponent_name"], h["result"])
@@ -166,6 +169,10 @@ def register_match(player1_id, player2_id):
 
         draw = input('Houve empate? (s/n)')
 
+        while draw.lower() not in ['s', 'n']:
+            print('Digite apenas o s para SIM e n para Não!')
+            draw = input('Houve empate? (s/n)')
+
         if draw.lower() == 's':
             draw = True
             player1.draws += 1
@@ -189,6 +196,18 @@ def register_match(player1_id, player2_id):
                 result_player_1 = 'Ganhou'
                 result_player_2 = 'Perdeu'
 
+                if len(player1.history) > 0:
+                    if player1.history[-1].result == 'Ganhou':
+                        player1.sequential_victories += 1
+                    else:
+                        player1.sequential_victories = 1
+                    
+                    if player1.sequential_victories > player1.max_sequential_victories:
+                        player1.max_sequential_victories = player1.sequential_victories
+                else:
+                    player1.sequential_victories = 1
+                    player1.max_sequential_victories = 1
+
             else:
                 winner_id = player2_id                           
                 player2.victories += 1
@@ -197,6 +216,18 @@ def register_match(player1_id, player2_id):
                 player1.score -= 1 if player1.score > 0 else 0 
                 result_player_1 = 'Perdeu'
                 result_player_2 = 'Ganhou'
+
+                if len(player2.history) > 0:
+                    if player2.history[-1].result == 'Ganhou':
+                        player2.sequential_victories += 1
+                    else:
+                        player2.sequential_victories = 1
+                    
+                    if player2.sequential_victories > player2.max_sequential_victories:
+                        player2.max_sequential_victories = player2.sequential_victories
+                else:
+                    player2.sequential_victories = 1
+                    player2.max_sequential_victories = 1
 
         
         id_max = 0
@@ -283,6 +314,40 @@ def ranking_players(players):
 
     return players
 
+def get_player_more_defeats():
+
+    players = fetch_players()
+    player_id = 0
+    more_defeats = 0
+
+    for player in players:
+
+        if player.defeats > more_defeats:
+            more_defeats = player.defeats
+            player_id = player.id
+
+    for player in players:
+
+        if player_id == player.id:
+            return player
+        
+def get_player_more_sequential_victories():
+
+    players = fetch_players()
+    player_id = 0
+    more_sequential_victories = 0
+
+    for player in players:
+
+        if player.max_sequential_victories > more_sequential_victories:
+            more_sequential_victories = player.max_sequential_victories
+            player_id = player.id
+
+    for player in players:
+
+        if player_id == player.id:
+            return player
+
 class Player:
 
     def __init__(self, id, name):
@@ -292,6 +357,8 @@ class Player:
         self.defeats = 0
         self.draws = 0
         self.score = 0
+        self.sequential_victories = 0
+        self.max_sequential_victories = 0
         self.history = []
     
     def for_dict(self):
@@ -308,6 +375,8 @@ class Player:
             "defeats": self.defeats,
             "draws": self.draws,
             "score": self.score,
+            "sequential_victories": self.sequential_victories,
+            "max_sequential_victories": self.max_sequential_victories,
             "history": history_dict
         }
 
@@ -395,7 +464,48 @@ while system_on:
             print("=" * 80)
 
         case "5":
-            print("Imprimir Relatório")
+
+            players = fetch_players()
+            total_players = len(players)
+            total_matchs = len(fetch_matchs())
+            player_more_sequential_vitories = get_player_more_sequential_victories()
+            player_more_defeats = get_player_more_defeats()
+            ranking_players(players)
+            player_number_1 = players[0]
+
+
+            with open(REPORT_ARCHIVE, "w", encoding="utf-8") as arquivo:
+
+                arquivo.write("=============================================================================\n")
+                arquivo.write("                           RELATÓRIO DO TORNEIO                              \n")
+                arquivo.write("=============================================================================\n\n")
+                
+                arquivo.write(f"-> Total de jogadores cadastrados: {total_players}\n")
+                arquivo.write(f"-> Total de partidas registradas: {total_matchs}\n")
+                arquivo.write(f"-> Líder do ranking: {player_number_1.name} ({player_number_1.score} pontos)\n")
+                arquivo.write(f"-> Jogador com mais derrotas: {player_more_defeats.name} ({player_more_defeats.defeats} derrotas)\n")
+                arquivo.write(f"-> Maior sequência de vitórias: {player_more_sequential_vitories.name} ({player_more_sequential_vitories.max_sequential_victories} seguidas)\n\n")
+                
+                arquivo.write("=============================================================================\n")
+                arquivo.write("                             RANKING GERAL                                   \n")
+                arquivo.write("=============================================================================\n")
+                
+                template_tabela = "{:<5} | {:<15} | {:<10} | {:<10} | {:<10} | {:<10}\n"
+                
+                arquivo.write(template_tabela.format("POS", "NOME", "PONTOS", "VITÓRIAS", "EMPATES", "DERROTAS"))
+                arquivo.write("-" * 77 + "\n")
+                
+                for i in range(len(players)):
+                    arquivo.write(template_tabela.format(
+                        f"{i + 1}º",
+                        players[i].name,
+                        players[i].score,
+                        players[i].victories,
+                        players[i].draws,
+                        players[i].defeats
+                    ))
+
+            print("Relatório e ranking gerados com sucesso no arquivo 'relatorio.txt'!")
 
         case "6":
 

@@ -1,0 +1,18 @@
+=============================================================================
+                           RELATÓRIO DO TORNEIO                              
+=============================================================================
+
+-> Total de jogadores cadastrados: 3
+-> Total de partidas registradas: 11
+-> Líder do ranking: Jorge (25 pontos)
+-> Jogador com mais derrotas: Cleiton (5 derrotas)
+-> Maior sequência de vitórias: Jorge (4 seguidas)
+
+=============================================================================
+                             RANKING GERAL                                   
+=============================================================================
+POS   | NOME            | PONTOS     | VITÓRIAS   | EMPATES    | DERROTAS  
+-----------------------------------------------------------------------------
+1º    | Jorge           | 25         | 8          | 2          | 1         
+2º    | Kleber          | 1          | 1          | 0          | 3         
+3º    | Cleiton         | 1          | 0          | 2          | 5         
