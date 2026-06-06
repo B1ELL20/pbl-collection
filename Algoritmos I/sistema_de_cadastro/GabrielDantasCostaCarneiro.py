@@ -5,6 +5,9 @@
 
 import json
 from pathlib import Path
+import subprocess
+
+# Busca o caminho do arquivo e adiciona como caminho base
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -13,6 +16,8 @@ system_on = True
 PLAYERS_ARCHIVE = BASE_DIR / "jogadores.json"
 MATCHS_ARCHIVE = BASE_DIR / "partidas.json"
 REPORT_ARCHIVE = BASE_DIR / "relatorio.txt"
+
+# Função para validar entrada de strings passando como parâmetro o número mínimo de caracteres que deseja
 
 def input_validation_string(min_len):
 
@@ -33,6 +38,8 @@ def input_validation_string(min_len):
 
     return value
 
+# Função para validadr entrada de números inteiros
+
 def input_validation_int():
 
     value = input()
@@ -40,45 +47,47 @@ def input_validation_int():
 
         try:
             value = int(value)
-            assert value >= 0
+            assert value > 0
 
         except:
-            print('O valor deve ser um inteiro positivo ou igual a zero!')
+            print('O valor deve ser um inteiro positivo maior que zero!')
             print('Digite o valor novamente:')
             value = input()
 
     return value
 
+# Função que busca jogadores no arquivo de registro json, converte em objetos do tipo PLayer e retorna a lista de objetos
 
 def fetch_players():
 
-    lista_jogadores = []
+    players_list = []
 
     try:
-        with open(PLAYERS_ARCHIVE, "r", encoding="utf-8") as f:
-            dados_do_arquivo = json.load(f)
+        with open(PLAYERS_ARCHIVE, "r", encoding="utf-8") as read_archive:
+            archive_data = json.load(read_archive)
             
-            for dados in dados_do_arquivo:
-                jogador = Player(dados["id"], dados["name"])
+            for data in archive_data:
+                player = Player(data["id"], data["name"])
 
-                jogador.victories = dados["victories"]
-                jogador.defeats = dados["defeats"]
-                jogador.draws = dados["draws"]
-                jogador.score = dados["score"]
-                jogador.sequential_victories = dados["sequential_victories"]
-                jogador.max_sequential_victories = dados["max_sequential_victories"]
+                player.victories = data["victories"]
+                player.defeats = data["defeats"]
+                player.draws = data["draws"]
+                player.score = data["score"]
+                player.sequential_victories = data["sequential_victories"]
+                player.max_sequential_victories = data["max_sequential_victories"]
 
-                for h in dados["history"]:
+                for h in data["history"]:
                     history = History(h["match_id"], h["oponent_id"], h["oponent_name"], h["result"])
-                    jogador.history.append(history)
+                    player.history.append(history)
                 
-                lista_jogadores.append(jogador)
+                players_list.append(player)
                 
     except FileNotFoundError:
         return []
         
-    return lista_jogadores
+    return players_list
 
+# Função que busca partidas no arquivo de registro json, converte em objetos do tipo Match e retorna a lista de objetos
 
 def fetch_matchs():
 
@@ -86,10 +95,10 @@ def fetch_matchs():
 
     try:
 
-        with open(MATCHS_ARCHIVE, "r", encoding="utf-8") as f:
-            dados_do_arquivo = json.load(f)  
+        with open(MATCHS_ARCHIVE, "r", encoding="utf-8") as read_archive:
+            archive_data = json.load(read_archive)
             
-            for dados in dados_do_arquivo:
+            for dados in archive_data:
 
                 match = Match(
                     dados["id"],
@@ -106,43 +115,45 @@ def fetch_matchs():
         
     return matchs_list
 
+# Funcão de registro de um jogador.
+# A Função faz a busca de jogadores registrados para capturar o maior id registrado, após isso cadastra um novo jogador pelo nome passado como parâmetro
+
 def register_player(name):
 
     new_players = []
-    jogadores_registrados = fetch_players()
+    register_players = fetch_players()
 
-    if len(jogadores_registrados) > 0:
-
-        for jogador in jogadores_registrados:
-
-            if jogador.name == name:
-                name = input('Nome já existe, digite um nome novamente!')
+    if len(register_players) > 0:
 
         id_max = 0
 
-        for jogador in jogadores_registrados:
+        for player in register_players:
 
-            if jogador.id > id_max:
-                id_max = jogador.id
+            if player.id > id_max:
+                id_max = player.id
 
-        jogador = Player(id_max + 1, name)
+        new_player = Player(id_max + 1, name)
 
-        new_players = [jogador.for_dict() for jogador in jogadores_registrados]
-        new_players.append(jogador.for_dict())
+        for player in register_players:
+            new_players.append(player.for_dict())
+
+        new_players.append(new_player.for_dict())
 
     else:
-        jogador = Player(1, name)
-        new_players = [jogador.for_dict()]
+        new_player = Player(1, name)
+        new_players = [new_player.for_dict()]
 
     try:
-        with open(PLAYERS_ARCHIVE, "w") as f:
-            json.dump(new_players, f, indent=4)
+        with open(PLAYERS_ARCHIVE, "w") as write_archive:
+            json.dump(new_players, write_archive, indent=4)
         
         print('\nJogador cadastrado com sucesso!')
 
     except:
         return print('Erro ao cadastrar jogador!')
-    
+
+
+# Função para registro de partidas, atualizando a pontuação e o historico dos jogadores envolvidos, tratando inexistência deles e o resultado da partida.
 
 def register_match(player1_id, player2_id):
 
@@ -170,7 +181,7 @@ def register_match(player1_id, player2_id):
         draw = input('Houve empate? (s/n)')
 
         while draw.lower() not in ['s', 'n']:
-            print('Digite apenas o s para SIM e n para Não!')
+            print('Digite apenas o s para SIM e n para NÃO!')
             draw = input('Houve empate? (s/n)')
 
         if draw.lower() == 's':
@@ -187,12 +198,15 @@ def register_match(player1_id, player2_id):
             print(f'Jogador 1: {player1.name} | Jogador 2: {player2.name}')
             winner = input('Qual jogador que venceu? (1/2)')
 
+            while winner.lower() not in ['1', '2']:
+                print('Digite apenas o 1 para JOGADOR 1 e 2 para JOGADOR 2!')
+                winner = input('Qual jogador que venceu? (1/2)')
+
             if winner == '1':
                 winner_id = player1_id
                 player1.victories += 1
                 player1.score += 3
                 player2.defeats += 1
-                player2.score -= 1 if player2.score > 0 else 0
                 result_player_1 = 'Ganhou'
                 result_player_2 = 'Perdeu'
 
@@ -213,7 +227,6 @@ def register_match(player1_id, player2_id):
                 player2.victories += 1
                 player2.score += 3
                 player1.defeats += 1
-                player1.score -= 1 if player1.score > 0 else 0 
                 result_player_1 = 'Perdeu'
                 result_player_2 = 'Ganhou'
 
@@ -237,7 +250,10 @@ def register_match(player1_id, player2_id):
                     id_max = match.id
 
         new_match = Match(id_max + 1, player1_id, player2_id, draw, winner_id)
-        new_matchs = [match.for_dict() for match in register_matchs]
+
+        for match in register_matchs:
+            new_matchs.append(match.for_dict())
+
         new_matchs.append(new_match.for_dict())
 
         history_player1 = History(new_match.id, player2_id, player2.name, result_player_1)
@@ -254,13 +270,17 @@ def register_match(player1_id, player2_id):
         new_players.append(player1.for_dict())
         new_players.append(player2.for_dict())
 
-        with open(MATCHS_ARCHIVE, "w") as f:
-            json.dump(new_matchs, f, indent=4)
+        with open(MATCHS_ARCHIVE, "w") as write_archive:
+            json.dump(new_matchs, write_archive, indent=4)
 
-        with open(PLAYERS_ARCHIVE, "w") as f:
-            json.dump(new_players, f, indent=4)
+        with open(PLAYERS_ARCHIVE, "w") as write_archive:
+            json.dump(new_players, write_archive, indent=4)
+
+        print('\nPartida cadastrada com sucesso!')
     else:
         print('Ids especificados não existem!')
+
+# Função que recebe como parâmetro o id de um jogador e retorna as infomações do mesmo.
 
 def get_player(id):
 
@@ -294,6 +314,8 @@ def get_player(id):
     if not exists_player:
         print('O jogador especificado não existe!')
 
+# Função que recebe a lista de jogadores registrados e retorna ela ordenada por score, vitórias, empates e menor derrotas, nessa ordem, utilizando algoritmo de ordenação por seleção.
+
 def ranking_players(players):
 
     tamanho = len(players)
@@ -314,6 +336,8 @@ def ranking_players(players):
 
     return players
 
+# Função que busca o jogador com maior número de derrotas
+
 def get_player_more_defeats():
 
     players = fetch_players()
@@ -331,6 +355,8 @@ def get_player_more_defeats():
         if player_id == player.id:
             return player
         
+# Função que busca o jogador com maior número de viórias sequenciais
+        
 def get_player_more_sequential_victories():
 
     players = fetch_players()
@@ -347,6 +373,8 @@ def get_player_more_sequential_victories():
 
         if player_id == player.id:
             return player
+        
+# Classe refrente a abstração de jogador
 
 class Player:
 
@@ -379,6 +407,8 @@ class Player:
             "max_sequential_victories": self.max_sequential_victories,
             "history": history_dict
         }
+    
+# Classe referente a abstração de partida
 
 class Match:
 
@@ -392,6 +422,8 @@ class Match:
     def for_dict(self):
         return self.__dict__
 
+# Classe referente a abstração de histórico de de partidas de um jogador
+
 class History:
 
     def __init__(self, match_id, oponent_id, oponent_name, result):
@@ -403,6 +435,7 @@ class History:
     def for_dict(self):
         return self.__dict__
 
+# Função para mostrar menu no terminal
 
 def show_menu():
     print("\n=== MENU DO CAMPEONATO ===")
@@ -413,6 +446,9 @@ def show_menu():
     print("5 - Gerar relatório do campeonato")
     print("6 - Sair")
 
+# Código principal
+# Sistema rodando em loop até que o usuário deseje finalizar operação
+
 while system_on:
 
     show_menu()
@@ -422,6 +458,7 @@ while system_on:
 
         case "1":
 
+            subprocess.run('cls', shell=True)
             print("Preciso de um nome com no mínimo 3 caracteres para registrar.")
             print("Digite o nome do jogador:")
             name = input_validation_string(3)
@@ -429,6 +466,7 @@ while system_on:
 
         case "2":
 
+            subprocess.run('cls', shell=True)
             print("Preciso do id de dois jogadores para registrar a partida.")
             print('Digite o id do primeiro jogador: ')
             player1_id = input_validation_int()
@@ -437,13 +475,15 @@ while system_on:
             register_match(player1_id, player2_id)
 
         case "3":
-
+            
             print('Digite o id do jogador que deseja consultar:')
             id = input_validation_int()
+            subprocess.run('cls', shell=True)
             get_player(id)
             
         case "4":
             
+            subprocess.run('cls', shell=True)
             players = fetch_players()
             ranking_players(players)
             
@@ -473,6 +513,7 @@ while system_on:
             ranking_players(players)
             player_number_1 = players[0]
 
+            subprocess.run('cls', shell=True)
 
             with open(REPORT_ARCHIVE, "w", encoding="utf-8") as arquivo:
 
@@ -509,8 +550,10 @@ while system_on:
 
         case "6":
 
+            subprocess.run('cls', shell=True)
             system_on = False
             print("Você finalizou o sistema! Até mais!")
 
         case _:
+            subprocess.run('cls', shell=True)
             print('Digite um comando válido!')

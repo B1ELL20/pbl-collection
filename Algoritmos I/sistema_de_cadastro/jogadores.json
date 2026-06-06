@@ -1,169 +1,145 @@
 [
     {
-        "id": 3,
-        "name": "Kleber",
+        "id": 2,
+        "name": "Jorge",
         "victories": 1,
-        "defeats": 3,
-        "draws": 0,
-        "score": 1,
+        "defeats": 2,
+        "draws": 1,
+        "score": 4,
+        "sequential_victories": 1,
+        "max_sequential_victories": 1,
+        "history": [
+            {
+                "match_id": 1,
+                "oponent_id": 1,
+                "oponent_name": "Ana",
+                "result": "Perdeu"
+            },
+            {
+                "match_id": 4,
+                "oponent_id": 4,
+                "oponent_name": "Julieta",
+                "result": "Ganhou"
+            },
+            {
+                "match_id": 6,
+                "oponent_id": 3,
+                "oponent_name": "Cleber",
+                "result": "Empatou"
+            },
+            {
+                "match_id": 7,
+                "oponent_id": 3,
+                "oponent_name": "Cleber",
+                "result": "Perdeu"
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "name": "Cleber",
+        "victories": 1,
+        "defeats": 0,
+        "draws": 3,
+        "score": 6,
         "sequential_victories": 1,
         "max_sequential_victories": 1,
         "history": [
             {
                 "match_id": 2,
-                "oponent_id": 1,
-                "oponent_name": "Jorge",
-                "result": "Perdeu"
+                "oponent_id": 4,
+                "oponent_name": "Julieta",
+                "result": "Empatou"
             },
             {
-                "match_id": 4,
+                "match_id": 3,
                 "oponent_id": 1,
+                "oponent_name": "Ana",
+                "result": "Empatou"
+            },
+            {
+                "match_id": 6,
+                "oponent_id": 2,
+                "oponent_name": "Jorge",
+                "result": "Empatou"
+            },
+            {
+                "match_id": 7,
+                "oponent_id": 2,
                 "oponent_name": "Jorge",
                 "result": "Ganhou"
-            },
-            {
-                "match_id": 5,
-                "oponent_id": 1,
-                "oponent_name": "Jorge",
-                "result": "Perdeu"
-            },
-            {
-                "match_id": 8,
-                "oponent_id": 1,
-                "oponent_name": "Jorge",
-                "result": "Perdeu"
             }
         ]
     },
     {
         "id": 1,
-        "name": "Jorge",
-        "victories": 8,
-        "defeats": 1,
-        "draws": 2,
-        "score": 25,
-        "sequential_victories": 1,
-        "max_sequential_victories": 4,
+        "name": "Ana",
+        "victories": 3,
+        "defeats": 0,
+        "draws": 1,
+        "score": 10,
+        "sequential_victories": 2,
+        "max_sequential_victories": 2,
         "history": [
             {
                 "match_id": 1,
                 "oponent_id": 2,
-                "oponent_name": "Cleiton",
-                "result": "Ganhou"
-            },
-            {
-                "match_id": 2,
-                "oponent_id": 3,
-                "oponent_name": "Kleber",
+                "oponent_name": "Jorge",
                 "result": "Ganhou"
             },
             {
                 "match_id": 3,
-                "oponent_id": 2,
-                "oponent_name": "Cleiton",
-                "result": "Ganhou"
-            },
-            {
-                "match_id": 4,
                 "oponent_id": 3,
-                "oponent_name": "Kleber",
-                "result": "Perdeu"
+                "oponent_name": "Cleber",
+                "result": "Empatou"
             },
             {
                 "match_id": 5,
-                "oponent_id": 3,
-                "oponent_name": "Kleber",
-                "result": "Ganhou"
-            },
-            {
-                "match_id": 6,
-                "oponent_id": 2,
-                "oponent_name": "Cleiton",
-                "result": "Ganhou"
-            },
-            {
-                "match_id": 7,
-                "oponent_id": 2,
-                "oponent_name": "Cleiton",
+                "oponent_id": 4,
+                "oponent_name": "Julieta",
                 "result": "Ganhou"
             },
             {
                 "match_id": 8,
-                "oponent_id": 3,
-                "oponent_name": "Kleber",
+                "oponent_id": 4,
+                "oponent_name": "Julieta",
                 "result": "Ganhou"
-            },
-            {
-                "match_id": 9,
-                "oponent_id": 2,
-                "oponent_name": "Cleiton",
-                "result": "Empatou"
-            },
-            {
-                "match_id": 10,
-                "oponent_id": 2,
-                "oponent_name": "Cleiton",
-                "result": "Ganhou"
-            },
-            {
-                "match_id": 11,
-                "oponent_id": 2,
-                "oponent_name": "Cleiton",
-                "result": "Empatou"
             }
         ]
     },
     {
-        "id": 2,
-        "name": "Cleiton",
+        "id": 4,
+        "name": "Julieta",
         "victories": 0,
-        "defeats": 5,
-        "draws": 2,
+        "defeats": 3,
+        "draws": 1,
         "score": 1,
         "sequential_victories": 0,
         "max_sequential_victories": 0,
         "history": [
             {
-                "match_id": 1,
-                "oponent_id": 1,
-                "oponent_name": "Jorge",
-                "result": "Perdeu"
-            },
-            {
-                "match_id": 3,
-                "oponent_id": 1,
-                "oponent_name": "Jorge",
-                "result": "Perdeu"
-            },
-            {
-                "match_id": 6,
-                "oponent_id": 1,
-                "oponent_name": "Jorge",
-                "result": "Perdeu"
-            },
-            {
-                "match_id": 7,
-                "oponent_id": 1,
-                "oponent_name": "Jorge",
-                "result": "Perdeu"
-            },
-            {
-                "match_id": 9,
-                "oponent_id": 1,
-                "oponent_name": "Jorge",
+                "match_id": 2,
+                "oponent_id": 3,
+                "oponent_name": "Cleber",
                 "result": "Empatou"
             },
             {
-                "match_id": 10,
-                "oponent_id": 1,
+                "match_id": 4,
+                "oponent_id": 2,
                 "oponent_name": "Jorge",
                 "result": "Perdeu"
             },
             {
-                "match_id": 11,
+                "match_id": 5,
                 "oponent_id": 1,
-                "oponent_name": "Jorge",
-                "result": "Empatou"
+                "oponent_name": "Ana",
+                "result": "Perdeu"
+            },
+            {
+                "match_id": 8,
+                "oponent_id": 1,
+                "oponent_name": "Ana",
+                "result": "Perdeu"
             }
         ]
     }

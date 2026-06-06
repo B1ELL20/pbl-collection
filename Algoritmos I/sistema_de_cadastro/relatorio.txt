@@ -2,17 +2,18 @@
                            RELATÓRIO DO TORNEIO                              
 =============================================================================
 
--> Total de jogadores cadastrados: 3
--> Total de partidas registradas: 11
--> Líder do ranking: Jorge (25 pontos)
--> Jogador com mais derrotas: Cleiton (5 derrotas)
--> Maior sequência de vitórias: Jorge (4 seguidas)
+-> Total de jogadores cadastrados: 4
+-> Total de partidas registradas: 8
+-> Líder do ranking: Ana (10 pontos)
+-> Jogador com mais derrotas: Julieta (3 derrotas)
+-> Maior sequência de vitórias: Ana (2 seguidas)
 
 =============================================================================
                              RANKING GERAL                                   
 =============================================================================
 POS   | NOME            | PONTOS     | VITÓRIAS   | EMPATES    | DERROTAS  
 -----------------------------------------------------------------------------
-1º    | Jorge           | 25         | 8          | 2          | 1         
-2º    | Kleber          | 1          | 1          | 0          | 3         
-3º    | Cleiton         | 1          | 0          | 2          | 5         
+1º    | Ana             | 10         | 3          | 1          | 0         
+2º    | Cleber          | 6          | 1          | 3          | 0         
+3º    | Jorge           | 4          | 1          | 1          | 2         
+4º    | Julieta         | 1          | 0          | 1          | 3         
